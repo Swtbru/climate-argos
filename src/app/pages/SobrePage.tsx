@@ -69,8 +69,20 @@ const odsData = [
 
 export default function SobrePage() {
   return (
-    <div className="flex-1 overflow-y-auto">
-      <div className="max-w-4xl mx-auto px-6 py-12 space-y-16">
+    <div className="flex-1 overflow-y-auto relative">
+      {/* video de fundo */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="fixed inset-0 w-full h-full object-cover pointer-events-none"
+        style={{ zIndex: 0, opacity: 0.15 }}
+      >
+        <source src="/assets/background_about.mp4" type="video/mp4" />
+      </video>
+
+      <div className="relative z-10 max-w-4xl mx-auto px-6 py-12 space-y-16">
 
         <section className="text-center space-y-4">
           <div className="flex justify-center mb-6">
