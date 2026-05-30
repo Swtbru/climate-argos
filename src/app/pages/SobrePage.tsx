@@ -1,8 +1,14 @@
 import { AlertTriangle, Satellite, Brain, Shield, Target, Building2, Droplets, Mountain, Waves, LayoutDashboard, ArrowRight } from "lucide-react";
 import { Link } from "react-router";
+import { motion } from "motion/react";
 
 const FONT_MONO = "JetBrains Mono, monospace";
 const FONT_DISPLAY = "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0 },
+};
 
 const casosReais = [
   {
@@ -84,7 +90,14 @@ export default function SobrePage() {
 
       <div className="relative z-10 max-w-4xl mx-auto px-6 py-12 space-y-16">
 
-        <section className="text-center space-y-4">
+        <motion.section
+          className="text-center space-y-4"
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.6 }}
+        >
           <div className="flex justify-center mb-6">
             <div className="relative w-16 h-16">
               <div className="absolute inset-0 rounded-full border-2 border-primary/40 animate-spin" style={{ animationDuration: "8s" }} />
@@ -102,7 +115,7 @@ export default function SobrePage() {
           </p>
 
           {/* explicação do nome */}
-          <div className="max-w-xl mx-auto bg-card/50 border border-border rounded-lg p-4 mt-4" style={{ backdropFilter: "blur(8px)" }}>
+          <div className="max-w-xl mx-auto bg-card/50 border border-border rounded-lg p-4 mt-4 backdrop-blur-md">
             <p className="text-sm text-muted-foreground leading-relaxed">
               <span className="text-primary" style={{ fontFamily: FONT_MONO }}>Climate</span> — do inglês, clima.{" "}
               <span className="text-accent" style={{ fontFamily: FONT_MONO }}>Argos</span> — na mitologia grega,
@@ -114,7 +127,7 @@ export default function SobrePage() {
 
           <div className="flex justify-center gap-3 pt-4">
             {["Satélites", "IA Preditiva", "Tempo Real"].map((tag) => (
-              <span key={tag} className="px-3 py-1 text-xs rounded border border-primary/30 text-primary bg-primary/10"
+              <span key={tag} className="px-3 py-1 text-xs rounded border border-primary/30 text-primary bg-primary/10 backdrop-blur-sm shadow-sm shadow-primary/10"
                 style={{ fontFamily: FONT_MONO }}>
                 {tag}
               </span>
@@ -125,8 +138,7 @@ export default function SobrePage() {
           <div className="pt-8">
             <Link
               to="/dashboard"
-              className="group inline-flex items-center gap-3 px-8 py-4 rounded-lg border-2 border-primary/50 bg-primary/10 hover:bg-primary/20 hover:border-primary transition-all"
-              style={{ backdropFilter: "blur(8px)" }}
+              className="group inline-flex items-center gap-3 px-8 py-4 rounded-lg border-2 border-primary/50 bg-primary/10 hover:bg-primary/25 hover:border-primary transition-all duration-300 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/50 hover:scale-[1.02] backdrop-blur-md"
             >
               <LayoutDashboard size={22} className="text-primary" />
               <span className="text-lg text-primary" style={{ fontFamily: FONT_DISPLAY, letterSpacing: "0.05em" }}>
@@ -135,16 +147,23 @@ export default function SobrePage() {
               <ArrowRight size={18} className="text-primary group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
-        </section>
+        </motion.section>
 
-        <section className="space-y-6">
+        <motion.section
+          className="space-y-6"
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+        >
           <div className="flex items-center gap-3">
             <AlertTriangle size={20} className="text-destructive" />
             <h2 className="text-2xl text-foreground" style={{ fontFamily: FONT_DISPLAY }}>
               O PROBLEMA
             </h2>
           </div>
-          <div className="bg-card/50 border border-border rounded-lg p-6 space-y-4" style={{ backdropFilter: "blur(8px)" }}>
+          <div className="bg-card/50 border border-border rounded-lg p-6 space-y-4 backdrop-blur-md">
             <p className="text-muted-foreground leading-relaxed">
               O Brasil é um dos países mais vulneráveis a desastres climáticos no mundo. Enchentes, deslizamentos de terra
               e rompimentos de barragens causam centenas de mortes e bilhões em prejuízos todos os anos. A combinação de
@@ -158,20 +177,27 @@ export default function SobrePage() {
             </p>
             <div className="grid grid-cols-3 gap-4 pt-4">
               {[
-                { value: "1.5M+", label: "Pessoas em áreas de risco no Brasil", color: "#ff3d57" },
-                { value: "R$170Bi", label: "Prejuízos com desastres (2013-2023)", color: "#ff9900" },
-                { value: "4.000+", label: "Municípios vulneráveis", color: "#7c3aed" },
-              ].map(({ value, label, color }) => (
-                <div key={label} className="text-center p-3 rounded border border-border bg-secondary/30">
+                { value: "1.5M+", label: "Pessoas em áreas de risco no Brasil", color: "#ff3d57", hoverClass: "hover:border-destructive/60 hover:shadow-lg hover:shadow-destructive/20" },
+                { value: "R$170Bi", label: "Prejuízos com desastres (2013-2023)", color: "#ff9900", hoverClass: "hover:border-[#ff9900]/60 hover:shadow-lg hover:shadow-[#ff9900]/20" },
+                { value: "4.000+", label: "Municípios vulneráveis", color: "#7c3aed", hoverClass: "hover:border-accent/60 hover:shadow-lg hover:shadow-accent/20" },
+              ].map(({ value, label, color, hoverClass }) => (
+                <div key={label} className={`text-center p-3 rounded border border-border bg-secondary/30 hover:scale-105 transition-all duration-300 ${hoverClass}`}>
                   <p className="text-xl" style={{ color, fontFamily: FONT_DISPLAY }}>{value}</p>
                   <p className="text-xs text-muted-foreground mt-1">{label}</p>
                 </div>
               ))}
             </div>
           </div>
-        </section>
+        </motion.section>
 
-        <section className="space-y-6">
+        <motion.section
+          className="space-y-6"
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+        >
           <div className="flex items-center gap-3">
             <Shield size={20} className="text-accent" />
             <h2 className="text-2xl text-foreground" style={{ fontFamily: FONT_DISPLAY }}>
@@ -183,8 +209,11 @@ export default function SobrePage() {
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {casosReais.map((caso) => (
-              <div key={caso.titulo} className="bg-card/50 border rounded-lg p-5 space-y-3 transition-all hover:border-opacity-60"
-                style={{ borderColor: caso.color + "33", backdropFilter: "blur(8px)" }}>
+              <div key={caso.titulo} className="bg-card/50 border rounded-lg p-5 space-y-3 transition-all duration-300 hover:scale-[1.02] backdrop-blur-md"
+                style={{ borderColor: caso.color + "33" }}
+                onMouseEnter={(e) => { e.currentTarget.style.borderColor = caso.color + "88"; e.currentTarget.style.boxShadow = `0 4px 20px ${caso.color}25`; }}
+                onMouseLeave={(e) => { e.currentTarget.style.borderColor = caso.color + "33"; e.currentTarget.style.boxShadow = "none"; }}
+              >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2">
                     <caso.icon size={16} style={{ color: caso.color }} />
@@ -205,16 +234,23 @@ export default function SobrePage() {
               </div>
             ))}
           </div>
-        </section>
+        </motion.section>
 
-        <section className="space-y-6">
+        <motion.section
+          className="space-y-6"
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+        >
           <div className="flex items-center gap-3">
             <Brain size={20} className="text-primary" />
             <h2 className="text-2xl text-foreground" style={{ fontFamily: FONT_DISPLAY }}>
               NOSSA SOLUÇÃO
             </h2>
           </div>
-          <div className="bg-card/50 border border-primary/20 rounded-lg p-6 space-y-4" style={{ backdropFilter: "blur(8px)" }}>
+          <div className="bg-card/50 border border-primary/20 rounded-lg p-6 space-y-4 backdrop-blur-md">
             <p className="text-muted-foreground leading-relaxed">
               O <strong className="text-foreground">ClimateArgos</strong> é uma plataforma de monitoramento climático que integra
               dados de satélites (Sentinel-2, GOES-16, MODIS), sensores IoT terrestres e modelos de inteligência artificial
@@ -226,7 +262,7 @@ export default function SobrePage() {
                 { icon: Brain, title: "IA Preditiva", desc: "Modelos de machine learning que analisam padrões climáticos e geológicos para prever eventos com horas de antecedência.", color: "#7c3aed" },
                 { icon: Target, title: "Alertas Preventivos", desc: "Sistema de alertas em tempo real com classificação de risco (crítico, alto, médio, baixo) para evacuação antecipada.", color: "#ff3d57" },
               ].map(({ icon: Icon, title, desc, color }) => (
-                <div key={title} className="p-4 rounded border border-border bg-secondary/20 space-y-2">
+                <div key={title} className="p-4 rounded border border-border bg-secondary/20 space-y-2 hover:scale-[1.02] transition-transform duration-200">
                   <Icon size={18} style={{ color }} />
                   <h4 className="text-foreground text-sm" style={{ fontFamily: FONT_DISPLAY }}>{title}</h4>
                   <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
@@ -234,9 +270,16 @@ export default function SobrePage() {
               ))}
             </div>
           </div>
-        </section>
+        </motion.section>
 
-        <section className="space-y-6">
+        <motion.section
+          className="space-y-6"
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+        >
           <div className="flex items-center gap-3">
             <Building2 size={20} className="text-accent" />
             <h2 className="text-2xl text-foreground" style={{ fontFamily: FONT_DISPLAY }}>
@@ -248,8 +291,11 @@ export default function SobrePage() {
           </p>
           <div className="space-y-4">
             {odsData.map((ods) => (
-              <div key={ods.numero} className="bg-card/50 border rounded-lg p-5 space-y-3"
-                style={{ borderColor: ods.color + "33", backdropFilter: "blur(8px)" }}>
+              <div key={ods.numero} className="bg-card/50 border rounded-lg p-5 space-y-3 backdrop-blur-md hover:scale-[1.01] transition-all duration-300"
+                style={{ borderColor: ods.color + "33" }}
+                onMouseEnter={(e) => { e.currentTarget.style.borderColor = ods.color + "88"; e.currentTarget.style.boxShadow = `0 4px 20px ${ods.color}25`; }}
+                onMouseLeave={(e) => { e.currentTarget.style.borderColor = ods.color + "33"; e.currentTarget.style.boxShadow = "none"; }}
+              >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded flex items-center justify-center shrink-0"
                     style={{ background: ods.color + "20", border: `1px solid ${ods.color}44` }}>
@@ -270,13 +316,20 @@ export default function SobrePage() {
               </div>
             ))}
           </div>
-        </section>
+        </motion.section>
 
-        <footer className="text-center py-8 border-t border-border">
+        <motion.footer
+          className="text-center py-8 border-t border-border"
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.6 }}
+        >
           <p className="text-xs text-muted-foreground" style={{ fontFamily: FONT_MONO }}>
             ClimateArgos — Global Solution 2026 · FIAPINHOS
           </p>
-        </footer>
+        </motion.footer>
       </div>
     </div>
   );
