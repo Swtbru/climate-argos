@@ -2,9 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { AlertTriangle, Droplets, Wind, Satellite } from "lucide-react";
 import { getPrecipitationTileUrl } from "../services/satellite";
 
+// fontes usadas no projeto
 const FONT_MONO = "JetBrains Mono, monospace";
 const FONT_DISPLAY = "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif";
 
+// tipo de cada zona de alerta no mapa
 interface AlertZone {
   id: string;
   lat: number;
@@ -16,6 +18,7 @@ interface AlertZone {
   probability: number;
 }
 
+// zonas de alerta que aparecem no mapa (dados simulados)
 const alertZones: AlertZone[] = [
   { id: "1", lat: -23.55, lng: -46.63, level: "critical", type: "flood", location: "São Paulo - Marginal", rainfall: 142, probability: 89 },
   { id: "2", lat: -22.9, lng: -43.17, level: "high", type: "landslide", location: "Rio de Janeiro - Serra", rainfall: 98, probability: 76 },
@@ -26,6 +29,7 @@ const alertZones: AlertZone[] = [
   { id: "7", lat: -3.71, lng: -38.54, level: "low", type: "storm", location: "Fortaleza - Litoral", rainfall: 18, probability: 12 },
 ];
 
+// cores de cada nivel de risco
 const levelColors: Record<string, string> = {
   critical: "#ff3d57",
   high: "#ff9900",
@@ -33,6 +37,7 @@ const levelColors: Record<string, string> = {
   low: "#00ff88",
 };
 
+// icones de cada tipo de desastre
 const typeIcons: Record<string, string> = {
   flood: "🌊",
   landslide: "⛰️",
@@ -41,19 +46,29 @@ const typeIcons: Record<string, string> = {
 };
 
 export function SatelliteMap({ onSelectZone }: { onSelectZone: (zone: AlertZone | null) => void }) {
+  // referencia pro elemento do mapa no DOM
   const mapRef = useRef<HTMLDivElement>(null);
+  // guarda a instancia do leaflet
   const mapInstanceRef = useRef<any>(null);
+  // guarda os marcadores pra poder limpar depois
   const markersRef = useRef<any[]>([]);
+  // guarda a camada do openweather pra trocar depois
+  const weatherLayerRef = useRef<any>(null);
+  // zona selecionada pelo usuario
   const [selectedZone, setSelectedZone] = useState<AlertZone | null>(null);
-  const [mapLayer, setMapLayer] = useState<"satellite" | "terrain" | "dark">("dark");
+  // camada meteorologica ativa (chuva, nuvens, temp ou vento)
+  const [weatherOverlay, setWeatherOverlay] = useState<"precipitation_new" | "clouds_new" | "temp_new" | "wind_new">("precipitation_new");
 
+  // inicializa o mapa quando o componente monta
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
 
     const initMap = async () => {
+      // importa o leaflet de forma dinamica pra nao pesar no bundle
       const L = await import("leaflet");
       await import("leaflet/dist/leaflet.css");
 
+      // cria o mapa centralizado no brasil
       const map = L.map(mapRef.current!, {
         center: [-15.77, -47.92],
         zoom: 5,
@@ -63,35 +78,33 @@ export function SatelliteMap({ onSelectZone }: { onSelectZone: (zone: AlertZone 
 
       mapInstanceRef.current = map;
 
-      const layers = {
-        dark: L.tileLayer(
-          "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-          { subdomains: "abcd", maxZoom: 19 }
-        ),
-        satellite: L.tileLayer(
-          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-          { maxZoom: 19 }
-        ),
-        terrain: L.tileLayer(
-          "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
-          { maxZoom: 17 }
-        ),
-      };
+      // adiciona o mapa base escuro
+      L.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+        { subdomains: "abcd", maxZoom: 19 }
+      ).addTo(map);
 
-      layers.dark.addTo(map);
-      (map as any)._layers_custom = layers;
-
-      const precipUrl = getPrecipitationTileUrl();
-      if (precipUrl) {
-        L.tileLayer(precipUrl, { opacity: 0.5, maxZoom: 19 }).addTo(map);
+      // adiciona a camada meteorologica do openweather (precipitação por padrao)
+      const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
+      if (apiKey) {
+        const wLayer = L.tileLayer(
+          `https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${apiKey}`,
+          { opacity: 1, maxZoom: 19 }
+        );
+        wLayer.addTo(map);
+        weatherLayerRef.current = wLayer;
       }
 
+      // botao de zoom no canto inferior direito
       L.control.zoom({ position: "bottomright" }).addTo(map);
 
+      // cria os marcadores de alerta no mapa
       alertZones.forEach((zone) => {
         const color = levelColors[zone.level];
+        // tamanho do marcador depende do nivel de risco
         const size = zone.level === "critical" ? 20 : zone.level === "high" ? 16 : 12;
 
+        // icone customizado com animacao de pulso
         const icon = L.divIcon({
           html: `
             <div style="
@@ -117,6 +130,7 @@ export function SatelliteMap({ onSelectZone }: { onSelectZone: (zone: AlertZone 
           iconAnchor: [size / 2, size / 2],
         });
 
+        // coloca o marcador no mapa e adiciona o click
         const marker = L.marker([zone.lat, zone.lng], { icon });
         marker.addTo(map);
         marker.on("click", () => {
@@ -128,6 +142,7 @@ export function SatelliteMap({ onSelectZone }: { onSelectZone: (zone: AlertZone 
         markersRef.current.push(marker);
       });
 
+      // se clicar fora de um marcador, deseleciona
       map.on("click", (e: any) => {
         if (!(e.originalEvent.target as HTMLElement).closest(".leaflet-marker-icon")) {
           setSelectedZone(null);
@@ -138,6 +153,7 @@ export function SatelliteMap({ onSelectZone }: { onSelectZone: (zone: AlertZone 
 
     initMap();
 
+    // limpa o mapa quando o componente desmonta
     return () => {
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
@@ -146,22 +162,30 @@ export function SatelliteMap({ onSelectZone }: { onSelectZone: (zone: AlertZone 
     };
   }, []);
 
-  const switchLayer = async (layer: "satellite" | "terrain" | "dark") => {
+  // troca a camada meteorologica (chuva, nuvens, temp, vento)
+  const switchWeatherOverlay = async (overlay: typeof weatherOverlay) => {
     if (!mapInstanceRef.current) return;
     const L = await import("leaflet");
     const map = mapInstanceRef.current;
-    map.eachLayer((l: any) => {
-      if (l instanceof L.TileLayer) map.removeLayer(l);
-    });
 
-    const tileUrls: Record<string, string> = {
-      dark: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-      satellite: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-      terrain: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
-    };
+    // remove a camada anterior
+    if (weatherLayerRef.current) {
+      map.removeLayer(weatherLayerRef.current);
+      weatherLayerRef.current = null;
+    }
 
-    L.tileLayer(tileUrls[layer], { subdomains: "abcd", maxZoom: 19 }).addTo(map);
-    setMapLayer(layer);
+    // adiciona a nova camada
+    const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
+    if (apiKey) {
+      const wLayer = L.tileLayer(
+        `https://tile.openweathermap.org/map/${overlay}/{z}/{x}/{y}.png?appid=${apiKey}`,
+        { opacity: 1, maxZoom: 19 }
+      );
+      wLayer.addTo(map);
+      weatherLayerRef.current = wLayer;
+    }
+
+    setWeatherOverlay(overlay);
   };
 
   return (
@@ -185,20 +209,25 @@ export function SatelliteMap({ onSelectZone }: { onSelectZone: (zone: AlertZone 
 
       <div ref={mapRef} className="w-full h-full" />
 
-      {/* botões de camada */}
+      {/* camadas meteorológicas */}
       <div className="absolute top-3 left-3 flex gap-1 z-[1000]">
-        {(["dark", "satellite", "terrain"] as const).map((l) => (
+        {([
+          { id: "precipitation_new", label: "Chuva" },
+          { id: "clouds_new", label: "Nuvens" },
+          { id: "temp_new", label: "Temp" },
+          { id: "wind_new", label: "Vento" },
+        ] as const).map(({ id, label }) => (
           <button
-            key={l}
-            onClick={() => switchLayer(l)}
-            className={`px-3 py-1 text-xs uppercase tracking-widest transition-all ${
-              mapLayer === l
-                ? "bg-primary text-primary-foreground"
+            key={id}
+            onClick={() => switchWeatherOverlay(id)}
+            className={`px-2 py-1 text-xs transition-all rounded-sm ${
+              weatherOverlay === id
+                ? "bg-primary/20 text-primary border border-primary/40"
                 : "bg-card/80 text-muted-foreground hover:text-foreground border border-border"
             }`}
             style={{ fontFamily: FONT_MONO, backdropFilter: "blur(8px)" }}
           >
-            {l}
+            {label}
           </button>
         ))}
       </div>

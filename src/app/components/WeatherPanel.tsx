@@ -1,11 +1,13 @@
-import { useState, useEffect } from "react";
-import { Cloud, Thermometer, Wind, Droplets, Eye, Gauge, RefreshCw } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Cloud, Thermometer, Wind, Droplets, Eye, Gauge, RefreshCw, MapPin, Search, X } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { fetchCurrentWeather, fetchForecast, type WeatherData, type ForecastPoint } from "../services/weather";
 
+// fontes usadas no projeto
 const FONT_MONO = "JetBrains Mono, monospace";
 const FONT_DISPLAY = "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif";
 
+// cidades padrao que aparecem no seletor
 const cities = [
   { name: "São Paulo", lat: -23.55, lng: -46.63 },
   { name: "Rio de Janeiro", lat: -22.9, lng: -43.17 },
@@ -14,6 +16,7 @@ const cities = [
   { name: "Porto Alegre", lat: -30.03, lng: -51.22 },
 ];
 
+// gera dados falsos de clima caso a API nao responda
 function mockClima(city: string) {
   const seed = city.charCodeAt(0);
   return {
@@ -29,6 +32,7 @@ function mockClima(city: string) {
   };
 }
 
+// gera dados falsos de previsao (24 horas)
 function mockPrevisao() {
   return Array.from({ length: 24 }, (_, i) => ({
     hour: `${String(i).padStart(2, "0")}:00`,
@@ -38,6 +42,7 @@ function mockPrevisao() {
   }));
 }
 
+// tooltip customizado pro grafico
 const ChartTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
@@ -51,6 +56,8 @@ const ChartTooltip = ({ active, payload, label }: any) => {
 };
 
 export function WeatherPanel() {
+  // estados do componente
+  const [availableCities, setAvailableCities] = useState(cities);
   const [selectedCity, setSelectedCity] = useState(cities[0]);
   const [weather, setWeather] = useState(mockClima(cities[0].name));
   const [forecast, setForecast] = useState(mockPrevisao());
@@ -58,6 +65,99 @@ export function WeatherPanel() {
   const [loading, setLoading] = useState(false);
   const [activeChart, setActiveChart] = useState<"rain" | "temp" | "risk">("rain");
 
+  // estados da pesquisa de cidade
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<{ name: string; lat: number; lng: number; state?: string }[]>([]);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchedCity, setSearchedCity] = useState<{ name: string; lat: number; lng: number } | null>(null);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // busca cidades pelo nome usando a API de geocoding do openweather
+  const searchCity = async (query: string) => {
+    if (query.length < 2) { setSearchResults([]); return; }
+    try {
+      const key = import.meta.env.VITE_OPENWEATHER_API_KEY;
+      if (!key) return;
+      const res = await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)},BR&limit=5&appid=${key}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      setSearchResults(data.map((d: any) => ({ name: d.name, lat: d.lat, lng: d.lon, state: d.state })));
+    } catch {}
+  };
+
+  // chamado a cada letra digitada, espera 400ms antes de buscar
+  const handleSearchInput = (value: string) => {
+    setSearchQuery(value);
+    setHighlightedIndex(-1);
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    searchTimeout.current = setTimeout(() => searchCity(value), 400);
+  };
+
+  // navegacao por teclado nos resultados da pesquisa
+  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHighlightedIndex((prev) => Math.min(prev + 1, searchResults.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlightedIndex((prev) => Math.max(prev - 1, 0));
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (highlightedIndex >= 0 && searchResults[highlightedIndex]) {
+        selectSearchResult(searchResults[highlightedIndex]);
+      }
+    } else if (e.key === "Escape") {
+      setShowSearch(false);
+      setSearchResults([]);
+    }
+  };
+
+  // quando o usuario seleciona uma cidade da pesquisa
+  const selectSearchResult = (result: { name: string; lat: number; lng: number }) => {
+    setSearchedCity(result);
+    setSelectedCity(result);
+    setShowSearch(false);
+    setSearchQuery("");
+    setSearchResults([]);
+  };
+
+  // remove a cidade pesquisada e volta pra primeira da lista
+  const removeSearchedCity = () => {
+    setSearchedCity(null);
+    setSelectedCity(availableCities[0]);
+  };
+
+  // tenta pegar a localizacao do usuario quando o componente monta
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        let cityName = "Minha Localização";
+
+        // usa geocoding reverso pra descobrir o nome da cidade do usuario
+        try {
+          const key = import.meta.env.VITE_OPENWEATHER_API_KEY;
+          if (key) {
+            const res = await fetch(`https://api.openweathermap.org/geo/1.0/reverse?lat=${latitude}&lon=${longitude}&limit=1&appid=${key}`);
+            if (res.ok) {
+              const data = await res.json();
+              if (data[0]?.name) cityName = data[0].name;
+            }
+          }
+        } catch {}
+
+        // adiciona a cidade do usuario como primeira opcao
+        const userCity = { name: cityName, lat: latitude, lng: longitude };
+        setAvailableCities([userCity, ...cities]);
+        setSelectedCity(userCity);
+      },
+      () => {} // se o usuario negar a permissao, nao faz nada
+    );
+  }, []);
+
+  // busca os dados de clima e previsao da API (ou usa mock se falhar)
   const carregarDados = async (city: typeof cities[0]) => {
     setLoading(true);
     const [realWeather, realForecast] = await Promise.all([
@@ -72,17 +172,21 @@ export function WeatherPanel() {
     setLoading(false);
   };
 
+  // atualiza os dados manualmente
   const refresh = () => carregarDados(selectedCity);
 
+  // carrega os dados toda vez que muda a cidade selecionada
   useEffect(() => {
     carregarDados(selectedCity);
   }, [selectedCity]);
 
+  // atualiza automaticamente a cada 60 segundos
   useEffect(() => {
     const interval = setInterval(refresh, 60000);
     return () => clearInterval(interval);
   }, [selectedCity]);
 
+  // configuracao dos graficos (cor e label de cada tipo)
   const chartConfig = {
     rain: { color: "#00d4ff", label: "Chuva (mm/h)", key: "rain" },
     temp: { color: "#ff9900", label: "Temperatura (°C)", key: "temp" },
@@ -104,28 +208,89 @@ export function WeatherPanel() {
         </button>
       </div>
 
+      {/* campo de pesquisa */}
+      <div className="relative">
+        <div className={`flex items-center gap-2 px-3 py-1.5 bg-secondary border rounded text-xs transition-colors duration-200 cursor-text ${showSearch ? "border-primary shadow-sm shadow-primary/20" : "border-border"}`}
+          style={{ fontFamily: FONT_MONO, height: "30px" }}
+          onClick={() => setShowSearch(true)}
+        >
+          <Search size={12} className="text-muted-foreground shrink-0" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => handleSearchInput(e.target.value)}
+            onKeyDown={handleSearchKeyDown}
+            placeholder="Buscar cidade..."
+            autoFocus={showSearch}
+            onFocus={() => setShowSearch(true)}
+            onBlur={() => { setTimeout(() => { setShowSearch(false); setSearchResults([]); setHighlightedIndex(-1); }, 200); }}
+            className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none min-w-0"
+            style={{ fontFamily: FONT_MONO, fontSize: "inherit" }}
+          />
+        </div>
+        {searchResults.length > 0 && showSearch && (
+          <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded shadow-lg z-50 overflow-hidden">
+            {searchResults.map((result, i) => (
+              <button
+                key={`${result.name}-${i}`}
+                onClick={() => selectSearchResult(result)}
+                className={`w-full px-3 py-2 text-xs text-left text-foreground transition-colors flex items-center gap-2 ${
+                  i === highlightedIndex ? "bg-primary/20 text-primary" : "hover:bg-primary/10"
+                }`}
+                style={{ fontFamily: FONT_MONO }}
+              >
+                <MapPin size={10} className="text-muted-foreground" />
+                {result.name}{result.state ? `, ${result.state}` : ""}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* seletor de cidade */}
-      <div className="flex gap-1 flex-wrap">
-        {cities.map((city) => (
+      <div className="flex gap-1 flex-wrap items-center">
+        {availableCities.map((city) => (
           <button
             key={city.name}
             onClick={() => setSelectedCity(city)}
-            className={`px-2 py-1 text-xs transition-all rounded-sm ${
+            className={`px-2 py-1 text-xs transition-all rounded-sm flex items-center gap-1 ${
               selectedCity.name === city.name
                 ? "bg-primary/20 text-primary border border-primary/40"
                 : "bg-secondary text-muted-foreground hover:text-foreground border border-transparent"
             }`}
             style={{ fontFamily: FONT_MONO }}
           >
-            {city.name}
+            {!cities.find(c => c.name === city.name) && <MapPin size={10} />}
+            {!cities.find(c => c.name === city.name) ? "Você" : city.name}
           </button>
         ))}
+        {searchedCity && (
+          <div className="flex items-center gap-0.5">
+            <button
+              onClick={() => setSelectedCity(searchedCity)}
+              className={`px-2 py-1 text-xs transition-all rounded-sm flex items-center gap-1 ${
+                selectedCity.name === searchedCity.name
+                  ? "bg-primary/20 text-primary border border-primary/40"
+                  : "bg-secondary text-muted-foreground hover:text-foreground border border-transparent"
+              }`}
+              style={{ fontFamily: FONT_MONO }}
+            >
+              <Search size={10} />
+              {searchedCity.name}
+            </button>
+            <button onClick={removeSearchedCity} className="text-muted-foreground hover:text-destructive transition-colors">
+              <X size={10} />
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="bg-secondary/30 border border-border rounded p-4">
         <div className="flex items-start justify-between mb-3">
           <div>
-            <p className="text-xs text-muted-foreground uppercase tracking-widest">{selectedCity.name}</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-widest">
+              {selectedCity.name}
+            </p>
             <p className="text-3xl text-foreground mt-1" style={{ fontFamily: FONT_DISPLAY }}>
               {weather.temp}°C
             </p>
