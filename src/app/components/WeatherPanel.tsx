@@ -59,10 +59,10 @@ export function WeatherPanel() {
   // estados do componente
   const [availableCities, setAvailableCities] = useState(cities);
   const [selectedCity, setSelectedCity] = useState(cities[0]);
-  const [weather, setWeather] = useState(mockClima(cities[0].name));
-  const [forecast, setForecast] = useState(mockPrevisao());
+  const [weather, setWeather] = useState<ReturnType<typeof mockClima> | null>(null);
+  const [forecast, setForecast] = useState<ReturnType<typeof mockPrevisao> | null>(null);
   const [lastUpdate, setLastUpdate] = useState(new Date());
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [activeChart, setActiveChart] = useState<"rain" | "temp" | "risk">("rain");
 
   // estados da pesquisa de cidade
@@ -192,6 +192,33 @@ export function WeatherPanel() {
     temp: { color: "#ff9900", label: "Temperatura (°C)", key: "temp" },
     risk: { color: "#ff3d57", label: "Risco (%)", key: "risk" },
   };
+
+  // tela de carregamento enquanto busca os dados pela primeira vez
+  if (loading && !weather) {
+    return (
+      <div className="flex flex-col h-full items-center justify-center gap-4">
+        <RefreshCw size={32} className="text-primary animate-spin" />
+        <p className="text-sm text-muted-foreground" style={{ fontFamily: FONT_MONO }}>
+          Carregando dados climáticos...
+        </p>
+      </div>
+    );
+  }
+
+  // se por algum motivo nao tiver dados (nao deveria acontecer, mas por seguranca)
+  if (!weather || !forecast) {
+    return (
+      <div className="flex flex-col h-full items-center justify-center gap-4">
+        <Cloud size={32} className="text-muted-foreground" />
+        <p className="text-sm text-muted-foreground" style={{ fontFamily: FONT_MONO }}>
+          Não foi possível carregar os dados.
+        </p>
+        <button onClick={refresh} className="text-xs text-primary hover:underline" style={{ fontFamily: FONT_MONO }}>
+          Tentar novamente
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full gap-4">
