@@ -62,14 +62,14 @@ export default function DashboardPage() {
                   <button
                     key={id}
                     onClick={() => setActivePanel(id)}
-                    className="flex-1 flex flex-col items-center gap-1 py-3 transition-all relative"
+                    className="flex-1 flex flex-col items-center gap-1 py-3 transition-all relative hover:bg-primary/5"
                     style={{
-                      background: activePanel === id ? "rgba(0,212,255,0.08)" : "transparent",
+                      background: activePanel === id ? "rgba(0,212,255,0.08)" : undefined,
                       borderBottom: activePanel === id ? "2px solid #00d4ff" : "2px solid transparent",
                     }}
                   >
-                    <Icon size={14} style={{ color: activePanel === id ? "#00d4ff" : "#5a7a9a" }} />
-                    <span style={{
+                    <Icon size={14} className="transition-colors" style={{ color: activePanel === id ? "#00d4ff" : "#5a7a9a" }} />
+                    <span className="transition-colors" style={{
                       fontFamily: FONT_MONO,
                       color: activePanel === id ? "#00d4ff" : "#5a7a9a",
                       fontSize: "0.6rem",
@@ -78,11 +78,6 @@ export default function DashboardPage() {
                     }}>
                       {label}
                     </span>
-                    {id === "alerts" && criticalCount > 0 && (
-                      <div className="absolute top-1.5 right-2 w-3.5 h-3.5 rounded-full bg-destructive flex items-center justify-center">
-                        <span style={{ fontSize: "0.5rem", color: "white", fontFamily: FONT_MONO }}>{criticalCount}</span>
-                      </div>
-                    )}
                   </button>
                 ))}
               </div>
@@ -172,12 +167,15 @@ export default function DashboardPage() {
             ].map(({ label, sub, value, color }) => (
               <div
                 key={label}
-                className="bg-card/50 border border-border rounded px-3 py-2"
+                className="bg-card/50 border border-border rounded px-3 py-2 relative"
                 style={{ backdropFilter: "blur(8px)" }}
               >
                 <p className="text-xs text-muted-foreground" style={{ fontSize: "0.65rem" }}>{sub}</p>
                 <p className="mt-0.5" style={{ color, fontFamily: FONT_DISPLAY, fontSize: "0.9rem" }}>{label}</p>
                 <p style={{ color, fontFamily: FONT_MONO, fontSize: "0.7rem", opacity: 0.8 }}>{value}</p>
+                <span className="absolute top-1 right-1 px-1 py-0.5 rounded" style={{ fontFamily: FONT_MONO, fontSize: "0.45rem", color, background: color + "15", border: `1px solid ${color}33` }}>
+                  SIMULAÇÃO
+                </span>
               </div>
             ))}
           </div>

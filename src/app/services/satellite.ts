@@ -14,6 +14,12 @@ function getYesterday(): string {
   return d.toISOString().split("T")[0];
 }
 
+function getTwoDaysAgo(): string {
+  const d = new Date();
+  d.setDate(d.getDate() - 2);
+  return d.toISOString().split("T")[0];
+}
+
 export const nasaLayers: SatelliteLayer[] = [
   {
     id: "truecolor",
@@ -21,15 +27,15 @@ export const nasaLayers: SatelliteLayer[] = [
     description: "Imagem de cor verdadeira do satélite Terra/MODIS",
     color: "#00ff88",
     getUrl: (date) =>
-      `${GIBS_BASE}/MODIS_Terra_CorrectedReflectance_TrueColor/default/${date || getYesterday()}/250m/3/3/4.jpg`,
+      `${GIBS_BASE}/MODIS_Terra_CorrectedReflectance_TrueColor/default/${date || getYesterday()}/250m/3/3/3.jpg`,
   },
   {
     id: "viirs",
     name: "VIIRS — Suomi NPP",
-    description: "Reflectância corrigida VIIRS/Suomi NPP (região diferente)",
+    description: "Reflectância corrigida VIIRS/Suomi NPP",
     color: "#7c3aed",
     getUrl: (date) =>
-      `${GIBS_BASE}/VIIRS_SNPP_CorrectedReflectance_TrueColor/default/${date || getYesterday()}/250m/3/2/5.jpg`,
+      `${GIBS_BASE}/VIIRS_SNPP_CorrectedReflectance_TrueColor/default/${date || getTwoDaysAgo()}/250m/3/3/4.jpg`,
   },
   {
     id: "clouds",
@@ -37,7 +43,7 @@ export const nasaLayers: SatelliteLayer[] = [
     description: "Temperatura do topo das nuvens (MODIS Terra)",
     color: "#00d4ff",
     getUrl: (date) =>
-      `${GIBS_BASE}/MODIS_Terra_Cloud_Top_Temp_Day/default/${date || getYesterday()}/2km/3/2/4.png`,
+      `${GIBS_BASE}/MODIS_Terra_Cloud_Top_Temp_Day/default/${date || getYesterday()}/2km/3/3/3.png`,
   },
 ];
 

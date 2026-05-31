@@ -99,13 +99,7 @@ export default function SobrePage() {
           transition={{ duration: 0.6 }}
         >
           <div className="flex justify-center mb-6">
-            <div className="relative w-16 h-16">
-              <div className="absolute inset-0 rounded-full border-2 border-primary/40 animate-spin" style={{ animationDuration: "8s" }} />
-              <div className="absolute inset-2 rounded-full border border-accent/30" style={{ transform: "rotate(45deg)" }} />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Satellite size={24} className="text-primary" />
-              </div>
-            </div>
+            <img src="/assets/logo.png" alt="ClimateArgos" className="w-32 h-32 rounded-full object-cover" />
           </div>
           <h1 className="text-4xl text-foreground" style={{ fontFamily: FONT_DISPLAY }}>
             ClimateArgos

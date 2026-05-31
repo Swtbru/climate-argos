@@ -344,6 +344,11 @@ export function WeatherPanel() {
               {cfg.label.split(" ")[0]}
             </button>
           ))}
+          {activeChart === "risk" && (
+            <span className="px-1.5 py-0.5 rounded text-destructive bg-destructive/10 border border-destructive/20" style={{ fontFamily: FONT_MONO, fontSize: "0.5rem" }}>
+              SIMULAÇÃO
+            </span>
+          )}
           <span className="ml-auto text-xs text-muted-foreground" style={{ fontFamily: FONT_MONO }}>
             {lastUpdate.toLocaleTimeString("pt-BR")}
           </span>

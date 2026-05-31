@@ -15,13 +15,7 @@ export function StatsBar() {
   return (
     <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-card/50" style={{ backdropFilter: "blur(10px)" }}>
       <div className="flex items-center gap-3 shrink-0">
-        <div className="relative w-8 h-8">
-          <div className="absolute inset-0 rounded-full border border-primary/40 animate-spin" style={{ animationDuration: "8s" }} />
-          <div className="absolute inset-1 rounded-full border border-accent/30" style={{ transform: "rotate(45deg)" }} />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Satellite size={14} className="text-primary" />
-          </div>
-        </div>
+        <img src="/assets/logo.png" alt="ClimateArgos" className="w-12 h-12 rounded-full object-cover" />
         <div className="space-y-1">
           <h1 className="text-foreground leading-none" style={{ fontFamily: FONT_DISPLAY, fontSize: "1.1rem" }}>
             ClimateArgos

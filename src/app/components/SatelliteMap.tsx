@@ -274,6 +274,11 @@ export function SatelliteMap({ onSelectZone }: { onSelectZone: (zone: AlertZone 
               <p className="text-sm" style={{ fontFamily: FONT_MONO, color: levelColors[selectedZone.level] }}>{selectedZone.probability}%</p>
             </div>
           </div>
+          <div className="flex justify-end">
+            <span className="px-1.5 py-0.5 rounded" style={{ fontFamily: FONT_MONO, fontSize: "0.5rem", color: levelColors[selectedZone.level], background: levelColors[selectedZone.level] + "15", border: `1px solid ${levelColors[selectedZone.level]}33` }}>
+              SIMULAÇÃO
+            </span>
+          </div>
         </div>
       )}
     </div>

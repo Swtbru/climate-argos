@@ -120,7 +120,7 @@ export function AIPrediction() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setRiskScore((prev) => Math.min(99, Math.max(20, prev + (Math.random() - 0.48) * 3)));
+      setRiskScore((prev) => Math.round(Math.min(99, Math.max(20, prev + (Math.random() - 0.48) * 3))));
       setConfidence((prev) => Math.min(99, Math.max(70, prev + (Math.random() - 0.5) * 1)));
     }, 5000);
     return () => clearInterval(interval);
@@ -155,7 +155,9 @@ export function AIPrediction() {
         <div className="flex items-center gap-2">
           <Brain size={16} className="text-accent" />
           <h3 className="text-foreground" style={{ fontFamily: FONT_DISPLAY }}>IA PREDITIVA</h3>
-          <span className="text-xs text-muted-foreground" style={{ fontFamily: FONT_MONO }}>TensorFlow.js</span>
+          <span className="px-1.5 py-0.5 rounded text-accent bg-accent/10 border border-accent/20" style={{ fontFamily: FONT_MONO, fontSize: "0.5rem" }}>
+            SIMULAÇÃO
+          </span>
         </div>
         <div className="flex items-center gap-1">
           <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />

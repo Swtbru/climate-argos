@@ -15,6 +15,9 @@ interface Alert {
   message: string;
   probability: number;
   source: string;
+  simulated?: boolean;
+  lat?: number;
+  lng?: number;
 }
 
 const levelColors: Record<string, string> = {
@@ -41,6 +44,9 @@ const initialAlerts: Alert[] = [
     message: "Nível do rio acima da cota de alerta. Risco de transbordamento em 2h.",
     probability: 89,
     source: "MODIS",
+    simulated: true,
+    lat: -23.55,
+    lng: -46.63,
   },
   {
     id: "a2",
@@ -51,6 +57,9 @@ const initialAlerts: Alert[] = [
     message: "Solo saturado acima de 85%. Risco de deslizamento.",
     probability: 76,
     source: "Sentinel-2",
+    simulated: true,
+    lat: -22.9,
+    lng: -43.17,
   },
   {
     id: "a3",
@@ -61,6 +70,9 @@ const initialAlerts: Alert[] = [
     message: "Nível d'água subiu 2.3m em 6h. Monitoramento reforçado.",
     probability: 68,
     source: "Sensor IoT",
+    simulated: true,
+    lat: -19.92,
+    lng: -43.94,
   },
   {
     id: "a4",
@@ -71,6 +83,9 @@ const initialAlerts: Alert[] = [
     message: "Célula convectiva se aproximando. Rajadas de até 85 km/h.",
     probability: 43,
     source: "Radar",
+    simulated: true,
+    lat: -25.43,
+    lng: -49.27,
   },
   {
     id: "a5",
@@ -81,17 +96,14 @@ const initialAlerts: Alert[] = [
     message: "61mm acumulados em 24h. Possíveis alagamentos.",
     probability: 21,
     source: "OpenWeather",
+    simulated: true,
+    lat: -30.03,
+    lng: -51.22,
   },
 ];
 
-function timeAgo(date: Date): string {
-  const diff = Date.now() - date.getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "Agora";
-  if (mins < 60) return `${mins}m atrás`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}h atrás`;
-  return `${Math.floor(hours / 24)}d atrás`;
+function formatTime(date: Date): string {
+  return date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
 }
 
 export function AlertSystem() {
@@ -149,6 +161,7 @@ export function AlertSystem() {
         <div className="flex items-center gap-2">
           <Activity size={16} className="text-destructive" />
           <h3 className="text-foreground" style={{ fontFamily: FONT_DISPLAY }}>CENTRAL DE ALERTAS</h3>
+          <span className="text-xs text-muted-foreground" style={{ fontFamily: FONT_MONO }}>INMET API</span>
         </div>
         <button
           onClick={() => setMuted(!muted)}
@@ -163,11 +176,13 @@ export function AlertSystem() {
           <button
             key={level}
             onClick={() => setFilter(filter === level ? "all" : level)}
-            className="rounded p-2 text-center transition-all"
+            className="rounded p-2 text-center transition-all hover:scale-105"
             style={{
               background: filter === level ? levelBg[level] : "rgba(13,26,46,0.5)",
               border: `1px solid ${filter === level ? levelColors[level] + "44" : "rgba(0,212,255,0.1)"}`,
             }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = levelColors[level] + "88"; e.currentTarget.style.boxShadow = `0 0 8px ${levelColors[level]}30`; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = filter === level ? levelColors[level] + "44" : "rgba(0,212,255,0.1)"; e.currentTarget.style.boxShadow = "none"; }}
           >
             <p className="text-xs" style={{ color: levelColors[level], fontFamily: FONT_MONO }}>{count}</p>
             <p className="text-xs text-muted-foreground capitalize">{level}</p>
@@ -201,9 +216,16 @@ export function AlertSystem() {
                   <span className="text-xs font-mono" style={{ color: levelColors[alert.level], fontFamily: FONT_MONO }}>
                     {alert.type}
                   </span>
-                  <span className="text-xs text-muted-foreground shrink-0" style={{ fontFamily: FONT_MONO }}>
-                    {timeAgo(alert.timestamp)}
-                  </span>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {alert.simulated && (
+                      <span className="px-1 py-0.5 rounded text-accent bg-accent/10 border border-accent/20" style={{ fontFamily: FONT_MONO, fontSize: "0.5rem" }}>
+                        SIMULAÇÃO
+                      </span>
+                    )}
+                    <span className="text-xs text-muted-foreground" style={{ fontFamily: FONT_MONO }}>
+                      {formatTime(alert.timestamp)}
+                    </span>
+                  </div>
                 </div>
                 <p className="text-xs text-foreground mt-0.5 truncate">{alert.location}</p>
               </div>
