@@ -13,7 +13,7 @@ export function StatsBar() {
   }, []);
 
   return (
-    <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-card/50" style={{ backdropFilter: "blur(10px)" }}>
+    <header className="flex items-center justify-between px-4 py-2 border-b border-border bg-card/50" style={{ backdropFilter: "blur(10px)" }}>
       <div className="flex items-center gap-3 shrink-0">
         <img src="/assets/logo.png" alt="ClimateArgos" className="w-12 h-12 rounded-full object-cover" />
         <div className="space-y-1">
@@ -34,6 +34,6 @@ export function StatsBar() {
           {time.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" }).toUpperCase()} · UTC-3
         </p>
       </div>
-    </div>
+    </header>
   );
 }

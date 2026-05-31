@@ -75,20 +75,21 @@ const odsData = [
 
 export default function SobrePage() {
   return (
-    <div className="flex-1 overflow-y-auto relative">
-      {/* video de fundo */}
+    <main className="flex-1 overflow-y-auto relative">
+      {/* video de fundo (decorativo) */}
       <video
         autoPlay
         muted
         loop
         playsInline
+        aria-hidden="true"
         className="fixed inset-0 w-full h-full object-cover pointer-events-none"
         style={{ zIndex: 0, opacity: 0.15 }}
       >
         <source src="/assets/background_about.mp4" type="video/mp4" />
       </video>
 
-      <div className="relative z-10 max-w-4xl mx-auto px-6 py-12 space-y-16">
+      <div id="conteudo-principal" className="relative z-10 max-w-4xl mx-auto px-6 py-12 space-y-16">
 
         <motion.section
           className="text-center space-y-4"
@@ -132,7 +133,7 @@ export default function SobrePage() {
           <div className="pt-8">
             <Link
               to="/dashboard"
-              className="group inline-flex items-center gap-3 px-8 py-4 rounded-lg border-2 border-primary/50 bg-primary/10 hover:bg-primary/25 hover:border-primary transition-all duration-300 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/50 hover:scale-[1.02] backdrop-blur-md"
+              className="group inline-flex items-center gap-3 px-8 py-4 rounded-lg border-2 border-primary/50 bg-primary/10 hover:bg-primary/25 hover:border-primary focus-visible:bg-primary/25 focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:scale-[1.02] transition-all duration-300 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/50 hover:scale-[1.02] backdrop-blur-md"
             >
               <LayoutDashboard size={22} className="text-primary" />
               <span className="text-lg text-primary" style={{ fontFamily: FONT_DISPLAY, letterSpacing: "0.05em" }}>
@@ -325,6 +326,6 @@ export default function SobrePage() {
           </p>
         </motion.footer>
       </div>
-    </div>
+    </main>
   );
 }

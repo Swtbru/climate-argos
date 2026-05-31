@@ -51,12 +51,14 @@ export function SatelliteImagery() {
       </div>
 
       {/* seletor de camadas */}
-      <div className="grid grid-cols-2 gap-1.5">
+      <div className="grid grid-cols-2 gap-1.5" role="group" aria-label="Camadas de satélite">
         {nasaLayers.map((l) => (
           <button
             key={l.id}
             onClick={() => setActiveLayer(l)}
-            className="flex items-center gap-2 p-2 rounded text-left transition-all"
+            aria-pressed={activeLayer.id === l.id}
+            aria-label={`Camada ${l.name}`}
+            className="flex items-center gap-2 p-2 rounded text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             style={{
               background: activeLayer.id === l.id ? l.color + "15" : "rgba(13,26,46,0.5)",
               border: `1px solid ${activeLayer.id === l.id ? l.color + "44" : "rgba(0,212,255,0.1)"}`,
@@ -123,19 +125,22 @@ export function SatelliteImagery() {
         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-1">
           <button
             onClick={() => setZoom((z) => Math.min(200, z + 20))}
-            className="w-6 h-6 bg-black/60 rounded flex items-center justify-center text-primary hover:bg-black/80 transition"
+            aria-label="Aumentar zoom"
+            className="w-6 h-6 bg-black/60 rounded flex items-center justify-center text-primary hover:bg-black/80 focus-visible:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary transition"
           >
             <ZoomIn size={12} />
           </button>
           <button
             onClick={() => setZoom((z) => Math.max(60, z - 20))}
-            className="w-6 h-6 bg-black/60 rounded flex items-center justify-center text-primary hover:bg-black/80 transition"
+            aria-label="Diminuir zoom"
+            className="w-6 h-6 bg-black/60 rounded flex items-center justify-center text-primary hover:bg-black/80 focus-visible:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary transition"
           >
             <ZoomOut size={12} />
           </button>
           <button
             onClick={() => { setZoom(100); setBrightness(100); setContrast(110); }}
-            className="w-6 h-6 bg-black/60 rounded flex items-center justify-center text-muted-foreground hover:text-foreground transition"
+            aria-label="Resetar visualização"
+            className="w-6 h-6 bg-black/60 rounded flex items-center justify-center text-muted-foreground hover:text-foreground focus-visible:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary transition"
           >
             <RotateCcw size={12} />
           </button>

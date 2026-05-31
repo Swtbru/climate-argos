@@ -203,7 +203,7 @@ export function WeatherPanel() {
             OpenWeather API
           </span>
         </div>
-        <button onClick={refresh} className="text-muted-foreground hover:text-primary transition-colors">
+        <button onClick={refresh} aria-label="Atualizar dados climáticos" className="text-muted-foreground hover:text-primary focus-visible:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:rounded transition-colors">
           <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
         </button>
       </div>
@@ -221,6 +221,9 @@ export function WeatherPanel() {
             onChange={(e) => handleSearchInput(e.target.value)}
             onKeyDown={handleSearchKeyDown}
             placeholder="Buscar cidade..."
+            aria-label="Buscar cidade"
+            aria-autocomplete="list"
+            aria-expanded={searchResults.length > 0 && showSearch}
             autoFocus={showSearch}
             onFocus={() => setShowSearch(true)}
             onBlur={() => { setTimeout(() => { setShowSearch(false); setSearchResults([]); setHighlightedIndex(-1); }, 200); }}
@@ -229,14 +232,16 @@ export function WeatherPanel() {
           />
         </div>
         {searchResults.length > 0 && showSearch && (
-          <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded shadow-lg z-50 overflow-hidden">
+          <div role="listbox" aria-label="Resultados da busca" className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded shadow-lg z-50 overflow-hidden">
             {searchResults.map((result, i) => (
               <button
                 key={`${result.name}-${i}`}
+                role="option"
+                aria-selected={i === highlightedIndex}
                 onClick={() => selectSearchResult(result)}
                 className={`w-full px-3 py-2 text-xs text-left text-foreground transition-colors flex items-center gap-2 ${
-                  i === highlightedIndex ? "bg-primary/20 text-primary" : "hover:bg-primary/10"
-                }`}
+                  i === highlightedIndex ? "bg-primary/20 text-primary" : "hover:bg-primary/10 focus-visible:bg-primary/10"
+                } focus-visible:outline-none`}
                 style={{ fontFamily: FONT_MONO }}
               >
                 <MapPin size={10} className="text-muted-foreground" />
@@ -278,7 +283,7 @@ export function WeatherPanel() {
               <Search size={10} />
               {searchedCity.name}
             </button>
-            <button onClick={removeSearchedCity} className="text-muted-foreground hover:text-destructive transition-colors">
+            <button onClick={removeSearchedCity} aria-label="Remover cidade pesquisada" className="text-muted-foreground hover:text-destructive focus-visible:text-destructive focus-visible:outline-none transition-colors">
               <X size={10} />
             </button>
           </div>

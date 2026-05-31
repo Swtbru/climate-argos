@@ -165,7 +165,8 @@ export function AlertSystem() {
         </div>
         <button
           onClick={() => setMuted(!muted)}
-          className="text-muted-foreground hover:text-foreground transition-colors"
+          aria-label={muted ? "Ativar notificações" : "Silenciar notificações"}
+          className="text-muted-foreground hover:text-foreground focus-visible:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:rounded transition-colors"
         >
           {muted ? <BellOff size={14} /> : <Bell size={14} className="text-primary" />}
         </button>
@@ -197,12 +198,17 @@ export function AlertSystem() {
             key={alert.id}
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
-            className="rounded border cursor-pointer transition-all"
+            role="button"
+            tabIndex={0}
+            aria-expanded={expandedId === alert.id}
+            aria-label={`Alerta ${alert.type} em ${alert.location}`}
+            className="rounded border cursor-pointer transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             style={{
               background: expandedId === alert.id ? levelBg[alert.level] : "rgba(8,14,30,0.8)",
               borderColor: expandedId === alert.id ? levelColors[alert.level] + "44" : "rgba(0,212,255,0.1)",
             }}
             onClick={() => setExpandedId(expandedId === alert.id ? null : alert.id)}
+            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setExpandedId(expandedId === alert.id ? null : alert.id); } }}
           >
             <div className="flex items-start gap-2 p-3">
               <div className="mt-0.5">

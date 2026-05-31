@@ -232,7 +232,8 @@ export function AIPrediction() {
       <button
         onClick={runPrediction}
         disabled={processing}
-        className="flex items-center justify-center gap-2 py-2 rounded border transition-all"
+        aria-label="Executar predição de risco"
+        className="flex items-center justify-center gap-2 py-2 rounded border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         style={{
           background: processing ? "rgba(124,58,237,0.1)" : "rgba(124,58,237,0.15)",
           borderColor: "rgba(124,58,237,0.4)",

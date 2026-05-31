@@ -210,7 +210,7 @@ export function SatelliteMap({ onSelectZone }: { onSelectZone: (zone: AlertZone 
       <div ref={mapRef} className="w-full h-full" />
 
       {/* camadas meteorológicas */}
-      <div className="absolute top-3 left-3 flex gap-1 z-[1000]">
+      <div className="absolute top-3 left-3 flex gap-1 z-[1000]" role="group" aria-label="Camadas meteorológicas">
         {([
           { id: "precipitation_new", label: "Chuva" },
           { id: "clouds_new", label: "Nuvens" },
@@ -220,10 +220,12 @@ export function SatelliteMap({ onSelectZone }: { onSelectZone: (zone: AlertZone 
           <button
             key={id}
             onClick={() => switchWeatherOverlay(id)}
-            className={`px-2 py-1 text-xs transition-all rounded-sm ${
+            aria-label={`Camada ${label}`}
+            aria-pressed={weatherOverlay === id}
+            className={`px-2 py-1 text-xs transition-all rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
               weatherOverlay === id
                 ? "bg-primary/20 text-primary border border-primary/40"
-                : "bg-card/80 text-muted-foreground hover:text-foreground border border-border"
+                : "bg-card/80 text-muted-foreground hover:text-foreground focus-visible:text-foreground border border-border"
             }`}
             style={{ fontFamily: FONT_MONO, backdropFilter: "blur(8px)" }}
           >
@@ -233,7 +235,7 @@ export function SatelliteMap({ onSelectZone }: { onSelectZone: (zone: AlertZone 
       </div>
 
       {/* indicador sentinel */}
-      <div className="absolute top-3 right-3 z-[1000] flex items-center gap-2 bg-card/80 border border-border px-3 py-1.5 rounded"
+      <div className="absolute top-12 right-3 md:top-3 md:right-3 z-[1000] flex items-center gap-2 bg-card/80 border border-border px-3 py-1.5 rounded"
         style={{ backdropFilter: "blur(8px)" }}>
         <Satellite size={12} className="text-primary animate-pulse" />
         <span className="text-xs text-primary" style={{ fontFamily: FONT_MONO }}>SENTINEL-2 LIVE</span>

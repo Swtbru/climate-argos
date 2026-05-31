@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { CloudRain, Satellite, Brain, Activity, ChevronLeft, ChevronRight, ArrowLeft } from "lucide-react";
+import { CloudRain, Satellite, Brain, Activity, ChevronLeft, ChevronRight, ArrowLeft, X } from "lucide-react";
 import { Link } from "react-router";
 import { StatsBar } from "../components/StatsBar";
 import { SatelliteMap } from "../components/SatelliteMap";
@@ -21,18 +21,120 @@ const panelConfig = [
   { id: "ai" as Panel, label: "IA", icon: Brain },
 ];
 
+// detecta se é mobile
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return isMobile;
+}
+
 export default function DashboardPage() {
+  const isMobile = useIsMobile();
   const [activePanel, setActivePanel] = useState<Panel>("weather");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [selectedZone, setSelectedZone] = useState<any>(null);
-  const criticalCount = 2;
+  // painel fullscreen no mobile (null = mostra só o mapa)
+  const [mobilePanel, setMobilePanel] = useState<Panel | null>(null);
 
+  // mobile: layout com bottom nav + fullscreen panels
+  if (isMobile) {
+    return (
+      <div className="flex-1 flex flex-col min-h-0">
+        {/* header */}
+        <div className="flex items-center" style={{ position: "relative", zIndex: 10 }}>
+          <Link
+            to="/"
+            aria-label="Voltar para página inicial"
+            className="flex items-center gap-1.5 px-3 py-2 text-muted-foreground hover:text-primary focus-visible:text-primary focus-visible:outline-none transition-colors shrink-0 border-r border-border bg-card/50 h-full"
+            style={{ backdropFilter: "blur(10px)" }}
+          >
+            <ArrowLeft size={14} />
+          </Link>
+          <div className="flex-1">
+            <StatsBar />
+          </div>
+        </div>
+
+        {/* conteudo: mapa ou painel fullscreen */}
+        <div className="flex-1 min-h-0 relative">
+          <AnimatePresence mode="wait">
+            {mobilePanel ? (
+              <motion.div
+                key={mobilePanel}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ duration: 0.2 }}
+                className="absolute inset-0 z-30 bg-card overflow-y-auto p-4"
+              >
+                <button
+                  onClick={() => setMobilePanel(null)}
+                  aria-label="Fechar painel"
+                  className="absolute top-3 right-3 z-40 w-8 h-8 flex items-center justify-center bg-secondary border border-border rounded-full hover:bg-destructive/20 focus-visible:bg-destructive/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary transition-colors"
+                >
+                  <X size={14} className="text-muted-foreground" />
+                </button>
+                {mobilePanel === "weather" && <WeatherPanel />}
+                {mobilePanel === "alerts" && <AlertSystem />}
+                {mobilePanel === "satellite" && <SatelliteImagery />}
+                {mobilePanel === "ai" && <AIPrediction />}
+              </motion.div>
+            ) : (
+              <motion.div
+                key="map"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="h-full"
+              >
+                <SatelliteMap onSelectZone={setSelectedZone} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* bottom navigation */}
+        <nav aria-label="Navegação do painel" className="flex border-t border-border bg-card/90 shrink-0" style={{ backdropFilter: "blur(10px)" }}>
+          {panelConfig.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              onClick={() => setMobilePanel(mobilePanel === id ? null : id)}
+              aria-label={`Abrir painel ${label}`}
+              aria-pressed={mobilePanel === id}
+              className="flex-1 flex flex-col items-center gap-1 py-2.5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
+              style={{
+                background: mobilePanel === id ? "rgba(0,212,255,0.08)" : undefined,
+                borderTop: mobilePanel === id ? "2px solid #00d4ff" : "2px solid transparent",
+              }}
+            >
+              <Icon size={16} style={{ color: mobilePanel === id ? "#00d4ff" : "#5a7a9a" }} />
+              <span style={{
+                fontFamily: FONT_MONO,
+                color: mobilePanel === id ? "#00d4ff" : "#5a7a9a",
+                fontSize: "0.55rem",
+                textTransform: "uppercase",
+              }}>
+                {label}
+              </span>
+            </button>
+          ))}
+        </nav>      </div>
+    );
+  }
+
+  // desktop: layout original com sidebar
   return (
     <div className="flex-1 flex flex-col min-h-0">
       <div className="flex items-center" style={{ position: "relative", zIndex: 10 }}>
         <Link
           to="/"
-          className="flex items-center gap-1.5 px-3 py-2 text-muted-foreground hover:text-primary transition-colors shrink-0 border-r border-border bg-card/50 h-full"
+          aria-label="Voltar para página inicial"
+          className="flex items-center gap-1.5 px-3 py-2 text-muted-foreground hover:text-primary focus-visible:text-primary focus-visible:outline-none transition-colors shrink-0 border-r border-border bg-card/50 h-full"
           style={{ backdropFilter: "blur(10px)" }}
         >
           <ArrowLeft size={14} />
@@ -55,14 +157,18 @@ export default function DashboardPage() {
               transition={{ duration: 0.25, ease: "easeInOut" }}
               className="flex flex-col border-r border-border bg-card/40 overflow-hidden shrink-0"
               style={{ backdropFilter: "blur(16px)" }}
+              aria-label="Painel lateral"
             >
               {/* tabs dos painéis */}
-              <div className="flex border-b border-border shrink-0">
+              <div role="tablist" aria-label="Painéis de dados" className="flex border-b border-border shrink-0">
                 {panelConfig.map(({ id, label, icon: Icon }) => (
                   <button
                     key={id}
+                    role="tab"
+                    aria-selected={activePanel === id}
+                    aria-label={`Painel ${label}`}
                     onClick={() => setActivePanel(id)}
-                    className="flex-1 flex flex-col items-center gap-1 py-3 transition-all relative hover:bg-primary/5"
+                    className="flex-1 flex flex-col items-center gap-1 py-3 transition-all relative hover:bg-primary/5 focus-visible:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
                     style={{
                       background: activePanel === id ? "rgba(0,212,255,0.08)" : undefined,
                       borderBottom: activePanel === id ? "2px solid #00d4ff" : "2px solid transparent",
@@ -106,7 +212,8 @@ export default function DashboardPage() {
         {/* toggle sidebar */}
         <button
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className="absolute z-20 top-1/2 -translate-y-1/2 w-4 h-10 flex items-center justify-center bg-card border border-border rounded-r hover:bg-secondary transition-all"
+          aria-label={sidebarCollapsed ? "Abrir painel lateral" : "Fechar painel lateral"}
+          className="absolute z-20 top-1/2 -translate-y-1/2 w-4 h-10 flex items-center justify-center bg-card border border-border rounded-r hover:bg-secondary focus-visible:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary transition-all"
           style={{
             left: sidebarCollapsed ? 0 : 320,
             transition: "left 0.25s ease",
@@ -144,7 +251,8 @@ export default function DashboardPage() {
                   </span>
                   <button
                     onClick={() => setSelectedZone(null)}
-                    className="text-muted-foreground hover:text-foreground transition-colors text-xs w-5 h-5 flex items-center justify-center rounded border border-border"
+                    aria-label="Fechar zona selecionada"
+                    className="text-muted-foreground hover:text-foreground focus-visible:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary transition-colors text-xs w-5 h-5 flex items-center justify-center rounded border border-border"
                   >
                     ✕
                   </button>
