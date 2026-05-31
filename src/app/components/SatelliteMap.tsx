@@ -74,6 +74,9 @@ export function SatelliteMap({ onSelectZone }: { onSelectZone: (zone: AlertZone 
         zoom: 5,
         zoomControl: false,
         attributionControl: false,
+        scrollWheelZoom: true,
+        wheelDebounceTime: 100,
+        wheelPxPerZoomLevel: 120,
       });
 
       mapInstanceRef.current = map;

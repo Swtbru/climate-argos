@@ -96,7 +96,7 @@ export default function SobrePage() {
           variants={fadeUp}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
+          viewport={{ once: false, margin: "-50px" }}
           transition={{ duration: 0.6 }}
         >
           <div className="flex justify-center mb-6">
@@ -149,7 +149,7 @@ export default function SobrePage() {
           variants={fadeUp}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
+          viewport={{ once: false, margin: "-50px" }}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
           <div className="flex items-center gap-3">
@@ -190,7 +190,7 @@ export default function SobrePage() {
           variants={fadeUp}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
+          viewport={{ once: false, margin: "-50px" }}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
           <div className="flex items-center gap-3">
@@ -236,7 +236,7 @@ export default function SobrePage() {
           variants={fadeUp}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
+          viewport={{ once: false, margin: "-50px" }}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
           <div className="flex items-center gap-3">
@@ -272,7 +272,7 @@ export default function SobrePage() {
           variants={fadeUp}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
+          viewport={{ once: false, margin: "-50px" }}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
           <div className="flex items-center gap-3">
@@ -318,7 +318,7 @@ export default function SobrePage() {
           variants={fadeUp}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
+          viewport={{ once: false, margin: "-50px" }}
           transition={{ duration: 0.6 }}
         >
           <p className="text-xs text-muted-foreground" style={{ fontFamily: FONT_MONO }}>
