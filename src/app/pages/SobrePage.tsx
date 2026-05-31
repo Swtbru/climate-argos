@@ -313,6 +313,56 @@ export default function SobrePage() {
           </div>
         </motion.section>
 
+        {/* conexao espacial */}
+        <motion.section
+          className="space-y-6"
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, margin: "-50px" }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+        >
+          <div className="flex items-center gap-3">
+            <Satellite size={20} className="text-primary" />
+            <h2 className="text-2xl text-foreground" style={{ fontFamily: FONT_DISPLAY }}>
+              CONEXÃO ESPACIAL
+            </h2>
+          </div>
+          <div className="bg-card/50 border border-border rounded-lg p-6 space-y-4 backdrop-blur-md">
+            <p className="text-muted-foreground leading-relaxed">
+              O ClimateArgos transforma dados de satélites em ação concreta na Terra. Utilizamos imagens dos satélites
+              <span className="text-primary"> MODIS</span> (NASA),
+              <span className="text-primary"> VIIRS</span> (Suomi NPP) e
+              <span className="text-primary"> GOES-16</span> (NOAA) para monitorar condições climáticas em tempo real
+              e antecipar desastres naturais antes que aconteçam.
+            </p>
+            <p className="text-muted-foreground leading-relaxed">
+              A economia espacial não é só sobre explorar o cosmos — é sobre usar a infraestrutura orbital para resolver
+              problemas reais. Cada imagem de satélite processada pelo nosso sistema pode significar um alerta antecipado
+              que salva vidas em comunidades vulneráveis.
+            </p>
+          </div>
+
+          <div className="bg-card/50 border border-border rounded-lg p-6 backdrop-blur-md">
+            <p className="text-sm text-muted-foreground mb-4" style={{ fontFamily: FONT_MONO }}>
+              SATÉLITES UTILIZADOS
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {[
+                { name: "MODIS", org: "NASA", desc: "Imagens de cor real e temperatura de nuvens", color: "#00ff88" },
+                { name: "VIIRS", org: "Suomi NPP", desc: "Cobertura global com menos gaps orbitais", color: "#7c3aed" },
+                { name: "GOES-16", org: "NOAA", desc: "Monitoramento geoestacionário das Américas", color: "#00d4ff" },
+              ].map(({ name, org, desc, color }) => (
+                <div key={name} className="p-3 rounded border border-border bg-secondary/30 hover:scale-105 transition-all duration-300" style={{ borderColor: color + "33" }}>
+                  <p className="text-xs font-bold" style={{ color, fontFamily: FONT_MONO }}>{name}</p>
+                  <p className="text-sm text-foreground mt-1" style={{ fontFamily: FONT_DISPLAY }}>{org}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.section>
+
         <motion.footer
           className="text-center py-8 border-t border-border"
           variants={fadeUp}
