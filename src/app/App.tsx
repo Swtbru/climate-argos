@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router";
 import DashboardPage from "./pages/DashboardPage";
 import SobrePage from "./pages/SobrePage";
+import { InstallPromptModal } from "./components/InstallPromptModal";
 
 function StarField() {
   const stars = Array.from({ length: 80 }, (_, i) => ({
@@ -63,6 +64,8 @@ export default function App() {
         <Route path="/" element={<SobrePage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
       </Routes>
+
+      <InstallPromptModal />
     </div>
   );
 }
