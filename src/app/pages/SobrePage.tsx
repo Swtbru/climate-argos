@@ -1,9 +1,17 @@
-import { AlertTriangle, Satellite, Brain, Shield, Target, Building2, Droplets, Mountain, Waves, LayoutDashboard, ArrowRight } from "lucide-react";
+import { AlertTriangle, Satellite, Brain, Shield, Target, Building2, Droplets, Mountain, Waves, LayoutDashboard, ArrowRight, Linkedin } from "lucide-react";
 import { Link } from "react-router";
 import { motion } from "motion/react";
 
 const FONT_MONO = "JetBrains Mono, monospace";
 const FONT_DISPLAY = "-apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif";
+
+const equipe = [
+  { nome: "Bruna Sousa", linkedin: "https://www.linkedin.com/in/brunasousasantos/" },
+  { nome: "Gabriel Kott", linkedin: "https://www.linkedin.com/in/gabriel-kott-3494342ab/" },
+  { nome: "Davi Simione", linkedin: "https://www.linkedin.com/in/davi-simione-01127830b/" },
+  { nome: "Caio Leme", linkedin: "https://www.linkedin.com/in/caiobertaglia/" },
+  { nome: "Gabriele Lopes", linkedin: "https://www.linkedin.com/in/gabrielelopes1925/" },
+];
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -364,13 +372,27 @@ export default function SobrePage() {
         </motion.section>
 
         <motion.footer
-          className="text-center py-8 border-t border-border"
+          className="text-center py-8 border-t border-border space-y-4"
           variants={fadeUp}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: false, margin: "-50px" }}
           transition={{ duration: 0.6 }}
         >
+          <div className="flex flex-wrap justify-center gap-4">
+            {equipe.map((membro) => (
+              <a
+                key={membro.nome}
+                href={membro.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-card/50 hover:bg-card hover:border-primary/50 hover:scale-105 transition-all duration-300 backdrop-blur-md"
+              >
+                <Linkedin size={14} className="text-primary" />
+                <span className="text-xs text-foreground" style={{ fontFamily: FONT_DISPLAY }}>{membro.nome}</span>
+              </a>
+            ))}
+          </div>
           <p className="text-xs text-muted-foreground" style={{ fontFamily: FONT_MONO }}>
             ClimateArgos — Global Solution 2026 · FIAPINHOS
           </p>
