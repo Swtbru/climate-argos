@@ -178,15 +178,15 @@ export default function SobrePage() {
               tarde demais — minutos antes do desastre, quando a evacuação já não é possível. A falta de integração entre
               dados satelitais, sensores terrestres e modelos preditivos impede uma resposta preventiva eficiente.
             </p>
-            <div className="grid grid-cols-3 gap-4 pt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
               {[
                 { value: "1.5M+", label: "Pessoas em áreas de risco no Brasil", color: "#ff3d57", hoverClass: "hover:border-destructive/60 hover:shadow-lg hover:shadow-destructive/20" },
                 { value: "R$170Bi", label: "Prejuízos com desastres (2013-2023)", color: "#ff9900", hoverClass: "hover:border-[#ff9900]/60 hover:shadow-lg hover:shadow-[#ff9900]/20" },
                 { value: "4.000+", label: "Municípios vulneráveis", color: "#7c3aed", hoverClass: "hover:border-accent/60 hover:shadow-lg hover:shadow-accent/20" },
               ].map(({ value, label, color, hoverClass }) => (
-                <div key={label} className={`text-center p-3 rounded border border-border bg-secondary/30 hover:scale-105 transition-all duration-300 ${hoverClass}`}>
-                  <p className="text-xl" style={{ color, fontFamily: FONT_DISPLAY }}>{value}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{label}</p>
+                <div key={label} className={`flex flex-col items-center justify-center text-center p-4 rounded border border-border bg-secondary/30 hover:scale-105 transition-all duration-300 min-h-[100px] overflow-hidden ${hoverClass}`}>
+                  <p className="text-2xl sm:text-xl font-bold break-all leading-tight" style={{ color, fontFamily: FONT_DISPLAY }}>{value}</p>
+                  <p className="text-xs text-muted-foreground mt-2 leading-snug">{label}</p>
                 </div>
               ))}
             </div>
@@ -355,16 +355,16 @@ export default function SobrePage() {
             <p className="text-sm text-muted-foreground mb-4" style={{ fontFamily: FONT_MONO }}>
               SATÉLITES UTILIZADOS
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
                 { name: "MODIS", org: "NASA", desc: "Imagens de cor real e temperatura de nuvens", color: "#00ff88" },
                 { name: "VIIRS", org: "Suomi NPP", desc: "Cobertura global com menos gaps orbitais", color: "#7c3aed" },
                 { name: "GOES-16", org: "NOAA", desc: "Monitoramento geoestacionário das Américas", color: "#00d4ff" },
               ].map(({ name, org, desc, color }) => (
-                <div key={name} className="p-3 rounded border border-border bg-secondary/30 hover:scale-105 transition-all duration-300" style={{ borderColor: color + "33" }}>
-                  <p className="text-xs font-bold" style={{ color, fontFamily: FONT_MONO }}>{name}</p>
-                  <p className="text-sm text-foreground mt-1" style={{ fontFamily: FONT_DISPLAY }}>{org}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{desc}</p>
+                <div key={name} className="p-5 rounded-lg border border-border bg-secondary/30 hover:scale-[1.02] transition-all duration-300 min-h-[120px] flex flex-col justify-center" style={{ borderColor: color + "33" }}>
+                  <p className="text-base font-bold" style={{ color, fontFamily: FONT_MONO }}>{name}</p>
+                  <p className="text-sm text-foreground mt-1 font-medium" style={{ fontFamily: FONT_DISPLAY }}>{org}</p>
+                  <p className="text-xs text-muted-foreground mt-2 leading-relaxed">{desc}</p>
                 </div>
               ))}
             </div>

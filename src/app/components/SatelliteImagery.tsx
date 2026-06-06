@@ -73,7 +73,7 @@ export function SatelliteImagery() {
       </div>
 
       {/* visualizador */}
-      <div className="relative rounded overflow-hidden border border-border bg-black" style={{ aspectRatio: "16/9" }}>
+      <div className="relative rounded overflow-hidden border border-border bg-black flex-1" style={{ minHeight: "200px" }}>
         <img
           src={layer.thumb}
           alt={layer.name}
