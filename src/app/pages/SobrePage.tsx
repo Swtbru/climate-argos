@@ -178,14 +178,14 @@ export default function SobrePage() {
               tarde demais — minutos antes do desastre, quando a evacuação já não é possível. A falta de integração entre
               dados satelitais, sensores terrestres e modelos preditivos impede uma resposta preventiva eficiente.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
               {[
                 { value: "1.5M+", label: "Pessoas em áreas de risco no Brasil", color: "#ff3d57", hoverClass: "hover:border-destructive/60 hover:shadow-lg hover:shadow-destructive/20" },
                 { value: "R$170Bi", label: "Prejuízos com desastres (2013-2023)", color: "#ff9900", hoverClass: "hover:border-[#ff9900]/60 hover:shadow-lg hover:shadow-[#ff9900]/20" },
                 { value: "4.000+", label: "Municípios vulneráveis", color: "#7c3aed", hoverClass: "hover:border-accent/60 hover:shadow-lg hover:shadow-accent/20" },
               ].map(({ value, label, color, hoverClass }) => (
-                <div key={label} className={`flex flex-col items-center justify-center text-center p-4 rounded border border-border bg-secondary/30 hover:scale-105 transition-all duration-300 min-h-[100px] overflow-hidden ${hoverClass}`}>
-                  <p className="text-2xl sm:text-xl font-bold break-all leading-tight" style={{ color, fontFamily: FONT_DISPLAY }}>{value}</p>
+                <div key={label} className={`flex flex-col items-center justify-center text-center p-4 rounded border border-border bg-secondary/30 hover:scale-105 transition-all duration-300 min-h-[100px] overflow-hidden text-balance ${hoverClass}`}>
+                  <p className="text-2xl md:text-xl font-bold break-all leading-tight" style={{ color, fontFamily: FONT_DISPLAY }}>{value}</p>
                   <p className="text-xs text-muted-foreground mt-2 leading-snug">{label}</p>
                 </div>
               ))}
